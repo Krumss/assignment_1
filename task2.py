@@ -92,16 +92,13 @@ def part2_forward_kinametic(viewer, joint_names, joint_parents, joint_offsets, j
     ########## Code Start ############
     for f in range(frame_number):
         for joint_idx, parent_idx in enumerate(joint_parents):
-            r1 = R.from_quat(joint_rotations[f][joint_idx])
-            rotation = r1 * R.from_quat(joint_rotations[f][parent_idx])
-            global_joint_orientations[f][joint_idx] = rotation.as_quat()
+            rotation = R.from_quat(joint_rotations[f][joint_idx])
+            orientation = R.from_quat(global_joint_orientations[f][parent_idx]) * rotation
+            global_joint_orientations[f][joint_idx] = orientation.as_quat()
 
-            pos = rotation.apply(joint_offsets[joint_idx])
-            joint_positions[f][joint_idx] = pos
+            pos =  R.from_quat(global_joint_orientations[f][parent_idx]).apply(joint_offsets[joint_idx])
 
-            global_joint_positions[f][joint_idx] = global_joint_positions[f][parent_idx] + joint_positions[f][joint_idx]
-
-        
+            global_joint_positions[f][joint_idx] = global_joint_positions[f][parent_idx] + pos        
 
     ########## Code End ############
     if not show_animation:
